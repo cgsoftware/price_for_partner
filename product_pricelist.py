@@ -201,13 +201,13 @@ class product_pricelist(osv.osv):
                         # False means no valid line found ! But we may not raise an
                         # exception here because it breaks the search
                         price = False
-                #import pdb;pdb.set_trace()
+                
                 if price:
                     if 'uom' in context and not uom_price_already_computed:
                         product = products_dict[product_id]
                         uom = product.uos_id or product.uom_id
                         price = self.pool.get('product.uom')._compute_price(cr, uid, uom.id, price, context['uom'])
-
+                #import pdb;pdb.set_trace()
                 if results.get(product_id):
                     results[product_id][pricelist_id] = price
                     results[product_id]['price_item_id'] = price_item_id
@@ -225,7 +225,15 @@ class product_pricelist(osv.osv):
         for riga in righe:      
             if riga['product_id'] == product_id and riga['partner_id'] == partner_id:
                 # ha trovato la riga con articolo e cliente o fornitore
-                risultati.append(riga)     
+                risultati.append(riga)
+        if len(risultati) == 0:
+            #import pdb;pdb.set_trace()
+            templ_id = product_obj.browse(cr,uid,product_id).product_tmpl_id.id
+            for riga in righe:             
+             if riga['product_tmpl_id'] == templ_id and riga['partner_id'] == partner_id:
+                # ha trovato la riga con Template  e cliente o fornitore
+                risultati.append(riga)    
+                
         if len(risultati) == 0:
             for riga in righe:
                 if riga['categ_id'] == categ_id and riga['partner_id'] == partner_id:
